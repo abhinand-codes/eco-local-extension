@@ -9,12 +9,11 @@ export const useSearchStore = defineStore('search', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  // In-memory cache
   const cache = new Map<string, { local: any[], api: any[] }>()
   let debounceTimer: any = null
 
   async function performSearch(newQuery: string) {
-    const trimmed = newQuery.trim()
+    const trimmed = newQuery.trim().toLowerCase()
     if (!trimmed) {
       localResults.value = []
       apiResults.value = []
@@ -22,9 +21,8 @@ export const useSearchStore = defineStore('search', () => {
       return
     }
 
-    // Check cache
-    if (cache.has(trimmed.toLowerCase())) {
-      const cached = cache.get(trimmed.toLowerCase())!
+    if (cache.has(trimmed)) {
+      const cached = cache.get(trimmed)!
       localResults.value = cached.local
       apiResults.value = cached.api
       loading.value = false
@@ -35,44 +33,43 @@ export const useSearchStore = defineStore('search', () => {
     error.value = null
 
     try {
-      // 1. Search Local Index
       const localResp = await fetch(browser.runtime.getURL('data/local-stores.json'))
-      if (!localResp.ok)
-        throw new Error('Local database unreachable')
-
       const allLocal = await localResp.json()
+
+      const searchTerms = trimmed.split(/\s+/).filter(t => t.length > 0)
+
       const filteredLocal = allLocal
-        .filter((s: any) =>
-          s.name.toLowerCase().includes(trimmed.toLowerCase())
-          || s.category.toLowerCase().includes(trimmed.toLowerCase()),
-        )
+        .filter((s: any) => {
+          const searchableText = `${s.name} ${s.category} ${(s.tags || []).join(' ')}`.toLowerCase()
+          return searchTerms.every((term) => {
+            const regex = new RegExp(`\\b${term}`, 'i')
+            return regex.test(searchableText)
+          })
+        })
         .map((s: any) => ({ ...s, source: 'Local Index' }))
 
       localResults.value = filteredLocal
 
-      // 2. Search Background API (Open Food Facts)
       try {
-        const response = await browser.runtime.sendMessage({
+        const response: any = await browser.runtime.sendMessage({
           type: 'SEARCH_API',
           query: trimmed,
         })
         apiResults.value = response?.results || []
       }
       catch (e) {
-        console.warn('API Search failed:', e)
+        console.warn('Background Search failed:', e)
         apiResults.value = []
-        // Don't fail the whole search if only API fails
       }
 
-      // Update cache
-      cache.set(trimmed.toLowerCase(), {
+      cache.set(trimmed, {
         local: localResults.value,
         api: apiResults.value,
       })
     }
     catch (err: any) {
-      console.error('Core search failed:', err)
-      error.value = 'Search system unavailable. Please try again.'
+      console.error('Search system error:', err)
+      error.value = 'Failed to fetch results. Check your connection.'
     }
     finally {
       loading.value = false
@@ -82,14 +79,8 @@ export const useSearchStore = defineStore('search', () => {
   function search(newQuery: string) {
     query.value = newQuery
 
-    if (debounceTimer)
+    if (debounceTimer) {
       clearTimeout(debounceTimer)
-
-    if (!newQuery.trim()) {
-      loading.value = false
-      localResults.value = []
-      apiResults.value = []
-      return
     }
 
     loading.value = true

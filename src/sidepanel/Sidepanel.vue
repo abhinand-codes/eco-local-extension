@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import browser from 'webextension-polyfill'
 import { useSearchStore } from '../popup/stores/search'
 import ResultList from '~/components/ResultList.vue'
 
@@ -11,14 +12,51 @@ const searchQuery = ref('')
 const tabs = ['Local Index', 'Open Food Facts']
 const activeTab = ref('Local Index')
 
+// This handles the user typing manually
 function handleSearch() {
   store.search(searchQuery.value)
 }
 
-onMounted(() => {
+// Logic to extract page context and auto-search
+async function syncPageContext() {
+  try {
+    const activeTabs = await browser.tabs.query({
+      active: true,
+      currentWindow: true,
+    })
+
+    if (activeTabs[0]?.id) {
+      const response = (await browser.tabs.sendMessage(
+        activeTabs[0].id,
+        { type: 'GET_PAGE_CONTEXT' },
+      )) as { title?: string }
+
+      if (response?.title && !searchQuery.value) {
+        searchQuery.value = response.title
+        store.search(response.title)
+      }
+    }
+  }
+  catch (e) {
+    // If we're on a browser internal page or content script hasn't loaded yet
+    console.warn('Could not get page context', e)
+  }
+}
+
+onMounted(async () => {
+  // 1. Check if store already has a query (from popup)
   if (store.query) {
     searchQuery.value = store.query
   }
+  else {
+    // 2. Otherwise, try to auto-search from current page
+    await syncPageContext()
+  }
+})
+
+// Optional: Re-sync context when the tab changes while sidepanel is open
+browser.tabs.onActivated.addListener(() => {
+  syncPageContext()
 })
 </script>
 
@@ -38,21 +76,19 @@ onMounted(() => {
           <input
             v-model="searchQuery"
             placeholder="Search stores or products..."
-            class="w-full p-3 pl-10 border border-green-200 dark:border-green-800 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 transition-all"
+            class="w-full p-3 pl-10 border border-green-200 dark:border-green-800 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 transition-all text-sm"
             @input="handleSearch"
           >
           <div class="absolute left-3 top-3.5 text-green-600 dark:text-green-400 opacity-50">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <div class="i-pixelarticons-search w-5 h-5" />
           </div>
         </div>
       </div>
 
       <div v-if="loading" class="text-center py-16">
-        <div class="animate-spin rounded-full h-10 w-10 border-4 border-green-700 border-t-transparent mx-auto mb-4 shadow-sm" />
-        <p class="text-green-600 dark:text-green-400 font-bold uppercase tracking-widest text-xs">
-          Scanning local directories...
+        <div class="animate-spin rounded-full h-10 w-10 border-4 border-green-700 border-t-transparent mx-auto mb-4" />
+        <p class="text-green-600 dark:text-green-400 font-bold uppercase tracking-widest text-[10px]">
+          Identifying products...
         </p>
       </div>
 
@@ -61,8 +97,8 @@ onMounted(() => {
           <button
             v-for="tab in tabs"
             :key="tab"
-            class="px-6 py-3 flex-1 text-[10px] font-black transition-all uppercase tracking-widest" :class="[activeTab === tab ? 'border-b-2 border-green-600 text-green-700 dark:text-green-400 bg-white dark:bg-gray-800' : 'text-gray-400 dark:text-gray-500 hover:text-green-600']"
             @click="activeTab = tab"
+            :class="['px-6 py-3 flex-1 text-[10px] font-black transition-all uppercase tracking-widest', activeTab === tab ? 'border-b-2 border-green-600 text-green-700 dark:text-green-400 bg-white dark:bg-gray-800' : 'text-gray-400 dark:text-gray-500 hover:text-green-600']"
           >
             {{ tab }}
           </button>
@@ -106,8 +142,5 @@ onMounted(() => {
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #10b981;
   border-radius: 10px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #059669;
 }
 </style>

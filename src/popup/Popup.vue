@@ -9,7 +9,7 @@ import ResultList from '~/components/ResultList.vue'
 const store = useSearchStore()
 const { localResults, apiResults, loading, error } = storeToRefs(store)
 
-const searchQuery = ref('')
+const searchQuery = ref(store.query || '')
 const tabs = ['Local Index', 'Open Food Facts', 'Favorites']
 const activeTab = ref('Local Index')
 const favorites = ref<any[]>([])
