@@ -3,29 +3,38 @@ import { onMounted, ref } from 'vue'
 import browser from 'webextension-polyfill'
 import { storeToRefs } from 'pinia'
 import { useSearchStore } from './stores/search'
+import { useFavorites } from './composables/useFavorites'
 import ResultList from '~/components/ResultList.vue'
 
 const store = useSearchStore()
 const { localResults, apiResults, loading } = storeToRefs(store)
 
 const searchQuery = ref('')
-const tabs = ['Local Index', 'Open Food Facts']
+const tabs = ['Local Index', 'Open Food Facts', 'Favorites']
 const activeTab = ref('Local Index')
+const favorites = ref<any[]>([])
+
+const { getAllFavorites } = useFavorites()
+
+async function loadFavorites() {
+  favorites.value = await getAllFavorites()
+}
 
 function handleSearch() {
   store.search(searchQuery.value)
 }
 
 onMounted(async () => {
-  const tabs = await browser.tabs.query({
+  await loadFavorites()
+  const activeTabs = await browser.tabs.query({
     active: true,
     currentWindow: true,
   })
 
-  if (tabs[0]?.id) {
+  if (activeTabs[0]?.id) {
     try {
       const response = (await browser.tabs.sendMessage(
-        tabs[0].id,
+        activeTabs[0].id,
         { type: 'GET_PAGE_CONTEXT' },
       )) as { title?: string }
 
@@ -64,7 +73,8 @@ onMounted(async () => {
         <button
           v-for="tab in tabs"
           :key="tab"
-          class="px-3 py-1 flex-1 text-sm font-medium transition-all" :class="[activeTab === tab ? 'border-b-2 border-green-600 text-green-700' : 'text-gray-500 hover:text-green-600']"
+          class="px-3 py-1 flex-1 text-sm font-medium transition-all"
+          :class="[activeTab === tab ? 'border-b-2 border-green-600 text-green-700' : 'text-gray-500 hover:text-green-600']"
           @click="activeTab = tab"
         >
           {{ tab }}
@@ -77,6 +87,10 @@ onMounted(async () => {
 
       <div v-else-if="activeTab === 'Open Food Facts'">
         <ResultList :results="apiResults" />
+      </div>
+
+      <div v-else-if="activeTab === 'Favorites'">
+        <ResultList :results="favorites" />
       </div>
     </div>
   </div>
