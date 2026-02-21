@@ -23,12 +23,12 @@ export async function getManifest() {
     },
     background: isFirefox
       ? {
-        scripts: ['dist/background/index.mjs'],
-        type: 'module',
-      }
+          scripts: ['dist/background/index.mjs'],
+          type: 'module',
+        }
       : {
-        service_worker: 'dist/background/index.mjs',
-      },
+          service_worker: 'dist/background/index.mjs',
+        },
     icons: {
       16: 'assets/icon-512.png',
       48: 'assets/icon-512.png',
