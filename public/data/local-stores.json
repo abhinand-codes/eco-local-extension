@@ -1,0 +1,22 @@
+[
+    {
+        "id": "1",
+        "name": "Maple Leaf Books",
+        "category": "books",
+        "url": "https://mapleleafbooks.ca",
+        "tags": [
+            "independent",
+            "canadian"
+        ]
+    },
+    {
+        "id": "2",
+        "name": "Northern Roast Coffee",
+        "category": "food",
+        "url": "https://northernroast.ca",
+        "tags": [
+            "local",
+            "coffee"
+        ]
+    }
+]
