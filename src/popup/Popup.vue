@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import browser from 'webextension-polyfill'
 import { storeToRefs } from 'pinia'
 import { useSearchStore } from './stores/search'
 import ResultList from '~/components/ResultList.vue'
@@ -14,6 +15,30 @@ const activeTab = ref('Local Index')
 function handleSearch() {
   store.search(searchQuery.value)
 }
+
+onMounted(async () => {
+  const tabs = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  })
+
+  if (tabs[0]?.id) {
+    try {
+      const response = (await browser.tabs.sendMessage(
+        tabs[0].id,
+        { type: 'GET_PAGE_CONTEXT' },
+      )) as { title?: string }
+
+      if (response?.title) {
+        searchQuery.value = response.title
+        store.search(response.title)
+      }
+    }
+    catch {
+      console.warn('No content script context available')
+    }
+  }
+})
 </script>
 
 <template>
