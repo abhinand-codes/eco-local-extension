@@ -24,8 +24,8 @@ function handleSearch() {
         EcoCart Helper
       </h1>
 
-      <div class="mb-6 bg-green-50 p-4 rounded-lg border border-green-100">
-        <h2 class="text-sm font-semibold text-green-800 uppercase tracking-wider mb-2">
+      <div class="mb-6 bg-green-50 p-4 rounded-lg border border-green-100 shadow-sm">
+        <h2 class="text-xs font-bold text-green-800 uppercase tracking-widest mb-2 opacity-70">
           Global Search
         </h2>
         <input
@@ -38,17 +38,17 @@ function handleSearch() {
 
       <div v-if="loading" class="text-center py-10">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-700 mx-auto mb-4" />
-        <p class="text-green-600">
-          Finding alternatives...
+        <p class="text-green-600 text-sm font-medium">
+          Scouring local directories...
         </p>
       </div>
 
       <div v-else>
-        <div class="flex border-b mb-4">
+        <div class="flex border-b mb-4 bg-gray-50 rounded-t-lg overflow-hidden">
           <button
             v-for="tab in tabs"
             :key="tab"
-            class="px-4 py-2 flex-1 text-sm font-bold transition-colors" :class="[activeTab === tab ? 'border-b-2 border-green-600 text-green-700 bg-green-50' : 'text-gray-500 hover:bg-gray-50']"
+            class="px-4 py-2 flex-1 text-xs font-bold transition-all uppercase tracking-tighter" :class="[activeTab === tab ? 'border-b-2 border-green-600 text-green-700 bg-white shadow-inner' : 'text-gray-400 hover:text-green-600']"
             @click="activeTab = tab"
           >
             {{ tab }}
