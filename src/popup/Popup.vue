@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSearchStore } from './stores/search'
-import ResultList from '~/components/ResultList.vue'
+import ResultList from './ResultList.vue'
 
 const store = useSearchStore()
 const { localResults, apiResults, loading } = storeToRefs(store)
@@ -18,28 +18,26 @@ function handleSearch() {
 
 <template>
   <div class="p-4 w-80">
-    <h1 class="text-xl font-bold mb-4 text-green-700">
+    <h1 class="text-xl font-bold mb-4">
       EcoCart Local
     </h1>
     <input
       v-model="searchQuery"
       placeholder="Search local alternatives..."
-      class="w-full p-2 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
+      class="w-full p-2 border rounded mb-4"
       @input="handleSearch"
     >
 
-    <div v-if="loading" class="text-center py-4">
-      <div class="animate-pulse text-green-600">
-        Searching eco-alternatives...
-      </div>
+    <div v-if="loading" class="text-center">
+      Searching...
     </div>
 
     <div v-else>
-      <div class="flex border-b mb-4">
+      <div class="flex border-b mb-2">
         <button
           v-for="tab in tabs"
           :key="tab"
-          class="px-3 py-1 flex-1 text-sm font-medium" :class="[activeTab === tab ? 'border-b-2 border-green-600 text-green-700' : 'text-gray-500 hover:text-green-600']"
+          class="px-3 py-1" :class="[activeTab === tab ? 'border-b-2 border-blue-500' : '']"
           @click="activeTab = tab"
         >
           {{ tab }}
