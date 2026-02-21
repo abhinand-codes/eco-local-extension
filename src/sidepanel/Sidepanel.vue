@@ -61,8 +61,8 @@ onMounted(() => {
           <button
             v-for="tab in tabs"
             :key="tab"
+            class="px-6 py-3 flex-1 text-[10px] font-black transition-all uppercase tracking-widest" :class="[activeTab === tab ? 'border-b-2 border-green-600 text-green-700 dark:text-green-400 bg-white dark:bg-gray-800' : 'text-gray-400 dark:text-gray-500 hover:text-green-600']"
             @click="activeTab = tab"
-            :class="['px-6 py-3 flex-1 text-[10px] font-black transition-all uppercase tracking-widest', activeTab === tab ? 'border-b-2 border-green-600 text-green-700 dark:text-green-400 bg-white dark:bg-gray-800' : 'text-gray-400 dark:text-gray-500 hover:text-green-600']"
           >
             {{ tab }}
           </button>

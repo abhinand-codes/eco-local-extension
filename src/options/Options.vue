@@ -28,7 +28,7 @@ import { storageDemo } from '~/logic/storage'
               Search Sources
             </h2>
           </div>
-          
+
           <div class="space-y-8">
             <label class="group/item flex items-start justify-between cursor-pointer p-5 hover:bg-white dark:hover:bg-gray-800 rounded-2xl transition-all border border-transparent hover:border-green-100 dark:hover:border-green-900/50 hover:shadow-sm">
               <div class="flex-1 pr-6">
@@ -37,7 +37,7 @@ import { storageDemo } from '~/logic/storage'
               </div>
               <input type="checkbox" checked class="w-7 h-7 accent-green-600 rounded-lg cursor-pointer">
             </label>
-            
+
             <label class="group/item flex items-start justify-between cursor-pointer p-5 hover:bg-white dark:hover:bg-gray-800 rounded-2xl transition-all border border-transparent hover:border-green-100 dark:hover:border-green-900/50 hover:shadow-sm">
               <div class="flex-1 pr-6">
                 <p class="font-black text-lg text-gray-900 dark:text-gray-200 group-hover/item:text-green-700 dark:group-hover/item:text-green-400 transition-colors">Independent Index</p>
@@ -50,19 +50,23 @@ import { storageDemo } from '~/logic/storage'
 
         <!-- User Preferences -->
         <section class="bg-white dark:bg-gray-900 p-10 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl flex flex-col justify-center">
-          <h2 class="text-2xl font-black mb-4 text-gray-900 dark:text-white uppercase tracking-tighter">User Metadata</h2>
-          <p class="text-sm text-gray-400 dark:text-gray-500 font-medium mb-8 leading-relaxed max-w-[280px]">Personalize how the extension identifies your shopping priorities.</p>
-          
+          <h2 class="text-2xl font-black mb-4 text-gray-900 dark:text-white uppercase tracking-tighter">
+            User Metadata
+          </h2>
+          <p class="text-sm text-gray-400 dark:text-gray-500 font-medium mb-8 leading-relaxed max-w-[280px]">
+            Personalize how the extension identifies your shopping priorities.
+          </p>
+
           <div class="space-y-6">
             <div>
               <label class="block text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase mb-3 tracking-[0.2em]">Sustainability Tagline</label>
-              <input 
-                v-model="storageDemo" 
+              <input
+                v-model="storageDemo"
                 placeholder="e.g. Shopping for a greener future"
                 class="w-full p-4 border border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-green-100 dark:focus:ring-green-900/20 focus:border-green-500 focus:outline-none bg-gray-50 dark:bg-gray-800 transition-all font-bold text-gray-700 dark:text-gray-300"
               >
             </div>
-            
+
             <button class="w-full py-5 bg-green-700 hover:bg-green-800 text-white font-black rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all uppercase tracking-[0.15em] text-sm active:scale-95">
               Confirm Changes
             </button>
@@ -71,7 +75,9 @@ import { storageDemo } from '~/logic/storage'
       </div>
 
       <footer class="mt-24 pt-10 border-t border-gray-100 dark:border-gray-900 flex flex-col md:flex-row justify-between items-center gap-6">
-        <p class="text-gray-400 dark:text-gray-600 font-black text-xs uppercase tracking-widest">© 2026 EcoCart Local v1.0.0</p>
+        <p class="text-gray-400 dark:text-gray-600 font-black text-xs uppercase tracking-widest">
+          © 2026 EcoCart Local v1.0.0
+        </p>
         <div class="flex items-center gap-6">
           <a href="#" class="text-gray-400 dark:text-gray-600 hover:text-green-600 transition-colors uppercase font-black text-[10px] tracking-widest">Docs</a>
           <a href="#" class="text-gray-400 dark:text-gray-600 hover:text-green-600 transition-colors uppercase font-black text-[10px] tracking-widest">Privacy</a>

@@ -7,7 +7,7 @@ import { useFavorites } from './composables/useFavorites'
 import ResultList from '~/components/ResultList.vue'
 
 const store = useSearchStore()
-const { localResults, apiResults, loading } = storeToRefs(store)
+const { localResults, apiResults, loading, error } = storeToRefs(store)
 
 const searchQuery = ref('')
 const tabs = ['Local Index', 'Open Food Facts', 'Favorites']
@@ -56,23 +56,26 @@ onMounted(async () => {
       <Logo class="w-6 h-6" />
       EcoCart Local
     </h1>
-    
+
+    <div v-if="error" class="mb-4 p-3 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl text-red-600 dark:text-red-400 text-[10px] font-bold flex items-center gap-2 shadow-sm">
+      <div class="i-pixelarticons-alert-circle w-4 h-4 flex-shrink-0" />
+      {{ error }}
+    </div>
+
     <div class="relative mb-4">
       <input
         v-model="searchQuery"
         placeholder="Search local alternatives..."
-        class="w-full p-2.5 pl-9 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50 dark:bg-gray-800 transition-all shadow-sm"
+        class="w-full p-2.5 pl-9 border border-gray-100 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50 dark:bg-gray-800 transition-all shadow-sm dark:shadow-none"
         @input="handleSearch"
       >
-      <div class="absolute left-3 top-3 text-gray-400">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+      <div class="absolute left-3 top-3.5 text-gray-400">
+        <div class="i-pixelarticons-search w-4 h-4" />
       </div>
     </div>
 
     <div v-if="loading" class="flex justify-center py-10">
-      <div class="animate-spin rounded-full h-8 w-8 border-3 border-green-500 border-t-transparent shadow-sm"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-green-500 border-t-transparent shadow-sm" />
     </div>
 
     <div v-else>
@@ -80,7 +83,7 @@ onMounted(async () => {
         <button
           v-for="tab in tabs"
           :key="tab"
-          class="px-4 py-2 flex-1 text-xs font-bold transition-all whitespace-nowrap uppercase tracking-tighter"
+          class="px-4 py-2 flex-1 text-[10px] font-black transition-all whitespace-nowrap uppercase tracking-widest"
           :class="[activeTab === tab ? 'border-b-2 border-green-600 text-green-700 dark:text-green-400' : 'text-gray-400 dark:text-gray-600 hover:text-green-600 dark:hover:text-green-500']"
           @click="activeTab = tab"
         >
